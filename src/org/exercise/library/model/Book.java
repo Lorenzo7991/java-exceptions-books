@@ -32,11 +32,20 @@ public class Book implements Serializable {
     public String getPublisher() {
         return publisher;
     }
-    //****************************************************
-    public void setTitle(String title) {
-        if (title == null || title.trim().isEmpty()) {
-            throw new IllegalArgumentException("Il titolo non può essere vuoto.");
+    //**************************** SETTER ************************
+    //Validation fot title, author and publisher fields
+    private void validateText(String text, String fieldName) {
+        if (text == null || text.trim().isEmpty()) {
+            throw new IllegalArgumentException(fieldName + " non può essere vuoto.");
         }
+        if (!text.matches("[a-zA-Z\\s]+")) {
+            throw new IllegalArgumentException(fieldName + " deve contenere solo lettere e spazi.");
+        }
+    }
+
+
+    public void setTitle(String title) {
+        validateText(title, "Il titolo");
         this.title = title;
     }
 
@@ -48,16 +57,12 @@ public class Book implements Serializable {
     }
 
     public void setPublisher(String publisher) {
-        if (publisher == null || publisher.trim().isEmpty()) {
-            throw new IllegalArgumentException("L'editore non può essere vuoto.");
-        }
+        validateText(publisher, "L'editore");
         this.publisher = publisher;
     }
 
     public void setAuthor(String author) {
-        if (author == null || author.trim().isEmpty()) {
-            throw new IllegalArgumentException("L'autore non può essere vuoto.");
-        }
+        validateText(author, "L'autore");
         this.author = author;
     }
 
