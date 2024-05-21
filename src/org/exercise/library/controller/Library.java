@@ -60,21 +60,26 @@ public class Library {
                 i--; }
         }
         scanner.close();
-        // Writing data on file
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("books.dat"))) {
-            oos.writeObject(books);
+        // Writing data to text file
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("books.txt"))) {
+            for (Book book : books) {
+                writer.write("Titolo: " + book.getTitle() + "\n");
+                writer.write("Pagine: " + book.getPages() + "\n");
+                writer.write("Autore: " + book.getAuthor() + "\n");
+                writer.write("Editore: " + book.getPublisher() + "\n\n");
+            }
+            System.out.println("Dati scritti su file 'books.txt'");
         } catch (IOException e) {
             System.out.println("Errore durante la scrittura dei dati su file: " + e.getMessage());
         }
         //Reading data from file
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("books.dat"))) {
-            Book[] readBooks = (Book[]) ois.readObject();
-
+        try (BufferedReader reader = new BufferedReader(new FileReader("books.txt"))) {
+            String line;
             System.out.println("\nDati dei libri letti dal file:");
-            for (Book book : readBooks) {
-                System.out.println(book);
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
             }
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
             System.out.println("Errore durante la lettura dei dati dal file: " + e.getMessage());
         }
     }
