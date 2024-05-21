@@ -1,7 +1,8 @@
 package org.exercise.library.controller;
-//Book class import
+
 import org.exercise.library.model.Book;
-//Import utility
+import org.exercise.library.model.InvalidBookDataException;
+
 import java.io.*;
 import java.util.Scanner;
 
@@ -9,22 +10,38 @@ public class Library {
     public static void main(String[] args) {
         //Initializing scanner obj
         Scanner scanner = new Scanner(System.in);
-
-        //First interaction with the user
-        System.out.print("Quanti libri vuoi inserire? ");
-        int nBooks = Integer.parseInt(scanner.nextLine());
-
-        //Initializing Book obj
-        Book[] books = new Book[nBooks];
-
-        //Iteration fo fill book fields
-        for (int i = 0; i < nBooks; i++){
+        //Utility variables
+        int nBooks = 0;
+        boolean validInput = false;
+        // Validation number of books to be inserted
+        while (!validInput) {
             try {
-                System.out.println("Titolo: ");
+                System.out.print("Quanti libri vuoi inserire? ");
+                String input = scanner.nextLine();
+                nBooks = Integer.parseInt(input);
+                if (nBooks <= 0) {
+                    throw new IllegalArgumentException("Il numero di libri deve essere maggiore di zero.");
+                }
+                validInput = true;
+            } catch (NumberFormatException e) {
+                System.out.println("Errore: Devi inserire un valore che sia un numero, intero e positivo.");
+            } catch (IllegalArgumentException e) {
+                System.out.println("Errore: " + e.getMessage());
+            }
+        }
+        //Initializing book obj
+        Book[] books = new Book[nBooks];
+        // Inserting data for each book
+        for (int i = 0; i < nBooks; i++) {
+            try {
+                System.out.println("Inserisci i dati per il libro " + (i + 1));
+
+                System.out.print("Titolo: ");
                 String title = scanner.nextLine();
 
                 System.out.print("Numero di pagine: ");
-                int pages = Integer.parseInt(scanner.nextLine());
+                String pagesInput = scanner.nextLine();
+                int pages = Integer.parseInt(pagesInput);
 
                 System.out.print("Autore: ");
                 String author = scanner.nextLine();
@@ -33,25 +50,27 @@ public class Library {
                 String publisher = scanner.nextLine();
 
                 books[i] = new Book(title, pages, author, publisher);
-            } catch (IllegalArgumentException e) {
-                System.out.println("Errore: " + e.getMessage());
+                //Exception management
+            } catch (NumberFormatException e) {
+                System.out.println("Errore: Il numero di pagine deve essere un numero intero positivo.");
                 i--;
-            }
+                //Custom exception management
+            } catch (InvalidBookDataException e) {
+                System.out.println("Errore: " + e.getMessage());
+                i--; }
         }
         scanner.close();
-
-        //Writing data to file
+        // Writing data on file
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("books.dat"))) {
             oos.writeObject(books);
         } catch (IOException e) {
             System.out.println("Errore durante la scrittura dei dati su file: " + e.getMessage());
         }
-
         //Reading data from file
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("books.dat"))) {
             Book[] readBooks = (Book[]) ois.readObject();
 
-            System.out.println("Dati dei libri letti dal file:");
+            System.out.println("\nDati dei libri letti dal file:");
             for (Book book : readBooks) {
                 System.out.println(book);
             }
